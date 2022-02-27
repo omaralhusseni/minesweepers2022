@@ -10,7 +10,7 @@ BLUE = (0, 0, 255)
 GREY = (104, 101, 115)
 WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1080
 CONNECT_TO_ROBOT = False
-CAMERA_IP = "http://192.168.214.229:8080/video"
+CAMERA_IP = "http://192.168.243.234:8080/video"
 
 if CONNECT_TO_ROBOT:
     # next create a socket object
@@ -46,8 +46,6 @@ def main():
     pygame.font.init()
     font = pygame.font.SysFont('Comic Sans MS', 30)
 
-
-
     while True:
         if CONNECT_TO_ROBOT:
             data = conn.recv(1024)
@@ -58,16 +56,16 @@ def main():
         frame, x, y, w, h = csrt.get_frame_warped(points)
         pg_img = pygame.surfarray.make_surface(frame)
         pg_img = pygame.transform.scale(pg_img, (600, 400))
-        SCREEN.blit(pg_img, (900, 120))
+        SCREEN.blit(pg_img, (950, 120))
 
         # draw grid
-        drawGrid((x, y))
+        drawGrid((x, y), frame.shape)
 
         # draw coords
-        font_hider = pygame.Rect(200, 800, 200, 45)
+        font_hider = pygame.Rect(200, 850, 200, 45)
         pygame.draw.rect(SCREEN, WHITE, font_hider)
         coords_surface = font.render('X' + str(x) + 'Y'+ str(y), False, BLACK)
-        SCREEN.blit(coords_surface, (200, 800))
+        SCREEN.blit(coords_surface, (200, 850))
         
 
 
@@ -79,18 +77,20 @@ def main():
         pygame.display.update()
 
 
-def drawGrid(pos):
+
+
+def drawGrid(pos, shape):
     x, y = pos
     blockSize = 35  # Set the size of the grid block
 
-    grid_pos_x = (x//WINDOW_WIDTH) * 19
-    grid_pos_y = (y//WINDOW_HEIGHT) * 19
+    grid_pos_x = round((x/shape[0]) * 20)
+    grid_pos_y = round((y/shape[1]) * 20)
 
-    for y in range(0, 19):
-        for x in range(0, 19):
+    for y in range(0, 20):
+        for x in range(0, 20):
             rect = pygame.Rect((blockSize*y)+200,
                                (blockSize*x)+120, blockSize, blockSize)
-
+                               
             if (grid_pos_x == x) & (grid_pos_y == y):
                 pygame.draw.rect(SCREEN, RED, rect)
             else:

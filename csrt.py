@@ -1,3 +1,4 @@
+from turtle import width
 import cv2
 import numpy as np
 import time
@@ -18,44 +19,26 @@ def set_ip(ip):
     time.sleep(2)
     return camera_ip
 
-
-def init_normal():
-    ok, frame = video.read()
-    bbox = cv2.selectROI(frame)
-    ok = tracker.init(frame, bbox)
-    return frame
-
 #malyana 5ara
 def init_warped(points):
     ok, original_frame = video.read()
-    frame = change_presp(original_frame, points)
+    original_frame = change_presp(original_frame, points)
 
-    frame = cv2.rotate(original_frame, cv2.ROTATE_90_CLOCKWISE)
+    o_width, o_height, _ = original_frame.shape
 
-    bbox = cv2.selectROI("Select object", original_frame)
+    scale_percent = 50 # percent of original size
+    width = int(original_frame.shape[1] * scale_percent / 100)
+    height = int(original_frame.shape[0] * scale_percent / 100)
+    dim = (height, width)
+    resized = cv2.resize(original_frame, dim, interpolation = cv2.INTER_AREA)
 
-    frame = cv2.rotate(original_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    bbox = cv2.selectROI(resized)
+    # nbbox = (int((bbox[0]/width)*o_width), int((bbox[1]/height)*o_height), int((bbox[2]/width)*o_width), int((bbox[3]/height)*o_height))
+    nbbox = (int((bbox[0]/height)*o_height), int((bbox[1]/width)*o_width), int((bbox[2]/height)*o_height), int((bbox[3]/width)*o_width))
 
-    bbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
-
-    ok = tracker.init(original_frame, bbox)
+    ok = tracker.init(original_frame, nbbox)
     cv2.destroyAllWindows()
     return original_frame
-
-
-def get_frame():
-    ok, frame = video.read()
-    ok, bbox = tracker.update(frame)
-    if ok:
-        (x, y, w, h) = [int(v) for v in bbox]
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2, 1)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return frame
-
-    else:
-        print("not found")
-        return frame
-
 
 def get_frame_warped(points):
     ok, frame = video.read()
@@ -71,6 +54,5 @@ def get_frame_warped(points):
     else:
         print("not founf")
         return (cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), 0, 0, 0, 0)
-
 
 
