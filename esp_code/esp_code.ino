@@ -1,14 +1,20 @@
 #include <ESP8266WiFi.h>
 
 #ifndef STASSID
-#define STASSID "robot"
-#define STAPSK "12345678"
+#define STASSID "Omar"  //change this to your WiFi network name
+#define STAPSK "123456789000" //change this to your WiFi password
 #endif
+#define echoPin 2 
+#define trigPin 3
+#define detector1 4
+#define detector2 5
 
 const char *ssid = STASSID;
 const char *password = STAPSK;
+long duration ;
+int distance ;
 
-const char *host = "192.168.244.203";
+const char *host = "192.168.244.203";  //change to your ip address
 const uint16_t port = 5054;
 bool connected = false;
 
@@ -17,23 +23,19 @@ WiFiClient client;
 void setup()
 {
     Serial.begin(9600);
-    // connect to a WiFi network
 
     Serial.println();
     Serial.println();
     Serial.print("Connecting to ");
     Serial.println(ssid);
 
-    /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
-        would try to act as both a client and an access-point and could cause
-        network-issues with your other WiFi-devices on your WiFi-network. */
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
-        Serial.print("connected");
+        Serial.println("connecting...");
     }
 
     Serial.println("");
@@ -42,6 +44,38 @@ void setup()
     Serial.println(WiFi.localIP());
 
     pinMode(13, INPUT);
+    pinMode(trigPin , OUTPUT);
+    pinMode(echoPin , OUTPUT);
+
+}
+
+bool check_mine_location(){
+    // check distance using ultrasonic sensor
+    digtalWrite(trigPin , LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin , HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin , LOW);
+    duration = pulseIn(echoPin , HIGH);
+    distance = duration / 58.2;
+    Serial.print("Distance: ");
+    Serial.println(distance);
+    if(distance < 10){
+        return  true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool check_mine(){
+    // check mine
+    if((digitalRead(detector1) == HIGH) || (digitalRead(detector2) == LOW)){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 void loop()
@@ -59,13 +93,14 @@ void loop()
         {
             Serial.println("connection failed");
             delay(1000);
+            return;
         }
 
         // This will send a string to the server
         Serial.println("Testing server connection");
         if (client.connected())
         {
-            client.println("hello from ROV robot");
+            client.println("test");
             connected = true;
         }
     }
@@ -73,17 +108,20 @@ void loop()
     // Read all the lines of the reply from server and print them to Serial
     while (client.available())
     {
-      Serial.println("Searching");
-      delay(100);
-      
-        if (digitalRead(13))
-        {
-            client.println("1");
-            Serial.println("1");
+    //   put detection code here
+        char c = client.read();
+        Serial.print(c);
+        if (c == '*') {
+            if (check_mine()) {
+                if (check_mine_location()) {
+                    client.println("up");
+                } else {
+                    client.println("down")
+                }
+            } else {
+                client.println("none")
+            }
         }
-        else
-        {
-            client.println("0");
-        }
+
     }
 }

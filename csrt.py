@@ -19,7 +19,6 @@ def set_ip(ip):
     time.sleep(2)
     return camera_ip
 
-#malyana 5ara
 def init_warped(points):
     ok, original_frame = video.read()
     original_frame = change_presp(original_frame, points)
@@ -27,20 +26,19 @@ def init_warped(points):
     o_width, o_height, _ = original_frame.shape
 
     scale_percent = 50 # percent of original size
-    width = int(original_frame.shape[1] * scale_percent / 100)
-    height = int(original_frame.shape[0] * scale_percent / 100)
+    width = int(original_frame.shape[0] * scale_percent / 100)
+    height = int(original_frame.shape[1] * scale_percent / 100)
     dim = (height, width)
     resized = cv2.resize(original_frame, dim, interpolation = cv2.INTER_AREA)
 
-    bbox = cv2.selectROI(resized)
-    # nbbox = (int((bbox[0]/width)*o_width), int((bbox[1]/height)*o_height), int((bbox[2]/width)*o_width), int((bbox[3]/height)*o_height))
+    bbox = cv2.selectROI("select the robot", resized)
     nbbox = (int((bbox[0]/height)*o_height), int((bbox[1]/width)*o_width), int((bbox[2]/height)*o_height), int((bbox[3]/width)*o_width))
 
     ok = tracker.init(original_frame, nbbox)
     cv2.destroyAllWindows()
     return original_frame
 
-def get_frame_warped(points):
+def get_frame_warped(points, crop_map):
     ok, frame = video.read()
     frame = change_presp(frame, points)
     ok, bbox = tracker.update(frame)
