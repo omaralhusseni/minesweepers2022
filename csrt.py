@@ -38,7 +38,7 @@ def init_warped(points):
     cv2.destroyAllWindows()
     return original_frame
 
-def get_frame_warped(points, crop_map):
+def get_frame_warped(points):
     ok, frame = video.read()
     frame = change_presp(frame, points)
     ok, bbox = tracker.update(frame)

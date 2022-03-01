@@ -78,7 +78,8 @@ def main():
 
         # draw live video feed
 
-        frame, x, y, w, h = csrt.get_frame_warped(points, [cx, cy, cw, ch])
+        frame, x, y, w, h = csrt.get_frame_warped(points)
+        frame = frame[cx:cx+cw, cy:cy+ch]
         pg_img = pygame.surfarray.make_surface(frame)
         pg_img = pygame.transform.scale(pg_img, (600, 400))
         SCREEN.blit(pg_img, (950, 120))
