@@ -30,7 +30,7 @@ def calibrate(HOST):
         if ok:
             cv2.setMouseCallback("Calibrate, 1-bottom left 2-up left 3-bottom right 4-up right", handle_click)
             for p in points:
-                cv2.circle(resized,(p[0],p[1]),10,(255,0,0),-1)
+                cv2.circle(resized,(p[0],p[1]),3,(255,0,0),-1)
 
         else:
             cv2.putText(y, 'Error', (100, 0),
@@ -46,4 +46,5 @@ def calibrate(HOST):
         y, x = int((p[1]/height)*o_height), int((p[0]/width)*o_width)
         points[points.index(p)] = (x, y)
 
+    print(points)
     return points

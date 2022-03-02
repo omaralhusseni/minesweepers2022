@@ -18,4 +18,5 @@ def change_presp(frame, points):
 
     result = cv2.rotate(result, cv2.ROTATE_90_COUNTERCLOCKWISE)
     result = cv2.rotate(result, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    
     return result

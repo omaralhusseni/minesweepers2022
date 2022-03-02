@@ -41,27 +41,20 @@ def main():
     points = calibrate(CAMERA_IP)
 
     csrt.set_ip(CAMERA_IP)
-    csrt.init_warped(points)
+
+    # crop frame    
+    frame = csrt.get_frame_warped_no_crop(points)
+    crop_map = csrt.init_crop(frame)
+    csrt.init_warped(points, crop_map)
 
     # for coordinates
     pygame.font.init()
     font = pygame.font.SysFont('Comic Sans MS', 30)
 
-    # crop frame
-    frame, x, y, w, h = csrt.get_frame_warped(points)
-    o_width, o_height, _ = frame.shape
 
-    scale_percent = 50  # percent of original size
-    width = int(frame.shape[0] * scale_percent / 100)
-    height = int(frame.shape[1] * scale_percent / 100)
-    dim = (height, width)
-    resized = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
-
-    bbox = cv2.selectROI("crop to the field", resized)
-    cx, cy, cw, ch = (int((bbox[1]/height)*o_height), int((bbox[0]/width)*o_width),
-                      int((bbox[3]/height)*o_height), int((bbox[2]/width)*o_width))
-
+    #updated by esp socket server
     mine_state = "none"
+
     while True:
         if CONNECT_TO_ROBOT:
             conn.sendall("*".encode())
@@ -77,9 +70,9 @@ def main():
             print(data, mine_state)
 
         # draw live video feed
+        frame, x, y, w, h = csrt.get_frame_warped(points, crop_map)
+        frame = cv2.circle(frame, (x, y), 10, RED) #for debuging
 
-        frame, x, y, w, h = csrt.get_frame_warped(points)
-        frame = frame[cx:cx+cw, cy:cy+ch]
         pg_img = pygame.surfarray.make_surface(frame)
         pg_img = pygame.transform.scale(pg_img, (600, 400))
         SCREEN.blit(pg_img, (950, 120))
