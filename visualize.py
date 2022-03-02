@@ -107,8 +107,6 @@ mines = {}
 
 
 def drawGrid(pos, shape, mines_state):
-
-    
     screen_x, screen_y = pos
     blockSize = 35  # Set the size of the grid block
 
@@ -126,15 +124,15 @@ def drawGrid(pos, shape, mines_state):
                 pygame.draw.rect(SCREEN, GREY, rect, 1)
 
             if (mines_state == 'up'):
-                mines[(grid_pos_x, grid_pos_y)] = 'up'
+                mines[(grid_pos_x, grid_pos_y)] = '1'
             elif (mines_state == 'down'):
-                mines[(grid_pos_x, grid_pos_y)] = 'down'
+                mines[(grid_pos_x, grid_pos_y)] = '2'
             else:
-                mines[(grid_pos_x, grid_pos_y)] = 'none'
+                mines[(grid_pos_x, grid_pos_y)] = '0'
 
-            if mines[(grid_pos_x, grid_pos_y)] == 'up':
+            if mines[(grid_pos_x, grid_pos_y)] == '1':
                 pygame.draw.rect(SCREEN, GREEN, rect)
-            elif mines[(grid_pos_x, grid_pos_y)] == 'down':
+            elif mines[(grid_pos_x, grid_pos_y)] == '2':
                 pygame.draw.rect(SCREEN, BLUE, rect)
 
 
