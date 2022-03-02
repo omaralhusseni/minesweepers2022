@@ -31,8 +31,8 @@ def main():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as Socket:
             Socket.bind((host, port))
             print("Server started on:", host, port)
-            Socket.listen()
             print("socket is listening")
+            Socket.listen()
             conn, addr = Socket.accept()
             print('Connected to', addr)
 
@@ -41,6 +41,7 @@ def main():
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
     SCREEN.fill(WHITE)
+    
     points = calibrate(CAMERA_IP)
 
     csrt.set_ip(CAMERA_IP)
@@ -63,12 +64,12 @@ def main():
             conn.sendall("*".encode())
             # receive data from esp
             data = conn.recv(1024)
-            if (data.decode("utf-8") == "up"):
-                mine_state = "up"
-            elif (data.decode("utf-8") == "down"):
-                mine_state = "down"
-            elif (data.decode("utf-8") == "none"):
-               mine_state = "none"
+            if (data.decode("utf-8") == "1"):
+                mine_state = "1"
+            elif (data.decode("utf-8") == "2"):
+                mine_state = "2"
+            elif (data.decode("utf-8") == "0"):
+               mine_state = "0"
 
             print(data, mine_state)
 
