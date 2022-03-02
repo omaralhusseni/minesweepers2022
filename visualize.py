@@ -1,3 +1,4 @@
+from re import M
 from calibrate import calibrate
 import pygame
 import sys
@@ -12,7 +13,7 @@ GREY = (104, 101, 115)
 GREEN = (0, 255, 0)
 WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1080
 CONNECT_TO_ROBOT = False
-CAMERA_IP = "http://192.168.51.97:8080/video"
+CAMERA_IP = "http://192.168.32.76:8080/video"
 
 if CONNECT_TO_ROBOT:
     # next create a socket object
@@ -104,14 +105,17 @@ mines = {}
 
 
 def drawGrid(pos, shape, mines_state):
+    map_width = 4
+    map_height = 19
+    
     screen_x, screen_y = pos
     blockSize = 35  # Set the size of the grid block
 
-    grid_pos_x = round((screen_x/shape[0]) * 20)
-    grid_pos_y = round((screen_y/shape[1]) * 20)
+    grid_pos_x = round((screen_x/shape[0]) * map_height)
+    grid_pos_y = round((screen_y/shape[1]) * map_width)
 
-    for y in range(0, 20):
-        for x in range(0, 20):
+    for y in range(0, map_width):
+        for x in range(0, map_height):
             rect = pygame.Rect((blockSize*y)+200,
                                (blockSize*x)+120, blockSize, blockSize)
 
